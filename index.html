@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f1e9">
+  <meta name="description" content="Cuestionario interactivo de redes informáticas, cableado y fibra óptica.">
+  <title>Cuestionario de redes | IMR</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      color-scheme: light;
+      --paper: #eef5f5;
+      --ink: #1b3239;
+      --muted: #63797c;
+      --primary: #007f95;
+      --mint: #dbf0f1;
+      --lime: #f2d34f;
+      --orange: #dc553f;
+      --line: #cfe0e0;
+      --white: #fffefd;
+      --mono: "DM Mono", monospace;
+      --sans: "Manrope", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: linear-gradient(rgba(0, 127, 149, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 127, 149, .055) 1px, transparent 1px);
+      background-size: 28px 28px;
+      font-family: var(--sans);
+    }
+
+    button { font: inherit; }
+    .shell { width: min(1120px, calc(100% - 48px)); margin: 0 auto; }
+    .topbar { height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 11px; font-size: 13px; font-weight: 800; letter-spacing: .04em; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; background: var(--orange); color: var(--white); border-radius: 3px; }
+    .brand-mark svg { width: 21px; height: 21px; }
+    .author { color: var(--muted); font: 11px var(--mono); }
+    main { padding: 48px 0 56px; }
+    .intro { display: grid; grid-template-columns: 1fr 250px; gap: 32px; align-items: end; margin-bottom: 28px; animation: enter .55s both; }
+    .eyebrow { margin: 0 0 13px; color: var(--primary); font: 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 700px; font-size: clamp(36px, 5vw, 58px); line-height: 1.04; letter-spacing: -.045em; }
+    h1 span { color: var(--primary); }
+    .intro-copy { max-width: 450px; margin: 16px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .network-art { height: 132px; position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 4px; background: rgba(255,254,253,.8); }
+    .network-art svg { width: 100%; height: 100%; }
+    .network-art circle:nth-of-type(3) { transform-box: fill-box; transform-origin: center; animation: node-pulse 2.6s ease-in-out infinite; }
+    .art-label { position: absolute; right: 12px; bottom: 10px; color: var(--muted); font: 9px var(--mono); letter-spacing: .08em; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: start; gap: 18px; }
+    .quiz-panel, .side-panel { background: var(--white); border: 1px solid var(--line); border-radius: 5px; box-shadow: 0 12px 32px rgba(22, 42, 40, .055); }
+    .quiz-panel { min-height: 424px; padding: 28px 32px 24px; border-top: 4px solid var(--orange); animation: enter .65s .08s both; }
+    .panel-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .question-count { color: var(--muted); font: 11px var(--mono); }
+    .topic-tag { padding: 7px 10px; background: var(--mint); color: var(--primary); border-radius: 2px; font: 10px var(--mono); }
+    .progress-track { height: 5px; margin: 17px 0 30px; background: #e1ebe6; }
+    .progress-fill { width: 0; height: 100%; background: var(--primary); transition: width .35s ease; }
+    .question { min-height: 82px; margin: 0 0 22px; font-size: 23px; line-height: 1.38; letter-spacing: -.025em; }
+    .question-visual { min-height: 112px; display: grid; grid-template-columns: 122px minmax(0, 1fr); align-items: center; gap: 18px; margin: 0 0 22px; padding: 12px 18px; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(115deg, #edf7f6, #f8fbf8); }
+    .visual-art { width: 122px; height: 82px; display: grid; place-items: center; border-radius: 6px; background: var(--white); }
+    .visual-art svg { width: 100%; height: 100%; }
+    .question-visual figcaption { display: grid; gap: 6px; }
+    .visual-kicker { color: var(--muted); font: 9px var(--mono); letter-spacing: .12em; }
+    .visual-title { color: var(--primary); font: 700 14px var(--sans); }
+    .answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    .answer {
+      width: 100%; min-height: 56px; display: flex; align-items: center; gap: 14px; padding: 10px 15px;
+      border: 1px solid var(--line); border-left: 3px solid transparent; border-radius: 7px; background: var(--white); color: var(--ink); text-align: left;
+      box-shadow: 0 2px 6px rgba(27, 50, 57, .045); cursor: pointer;
+      transition: background .18s, border-color .18s, transform .18s, box-shadow .18s;
+    }
+    .answer:hover:not(:disabled) { border-color: var(--primary); background: #f0fafa; transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 127, 149, .12); }
+    .answer:focus-visible, .primary-button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+    .answer:disabled { cursor: default; }
+    .answer-key { width: 30px; height: 30px; flex: 0 0 30px; display: grid; place-items: center; border: 1px solid #d1e8e9; border-radius: 8px; background: #eaf5f5; color: var(--primary); font: 11px var(--mono); transition: background .18s, color .18s; }
+    .answer:hover:not(:disabled) .answer-key { border-color: var(--primary); background: var(--primary); color: white; }
+    .answer-text { flex: 1; font-size: 13px; font-weight: 700; line-height: 1.45; }
+    .answer-mark { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; font-size: 14px; font-weight: 800; }
+    .answer.correct { border-color: #168b68; border-left-color: #168b68; background: #e9f6ef; box-shadow: 0 4px 12px rgba(22, 139, 104, .1); }
+    .answer.correct .answer-key { border-color: #168b68; background: #168b68; color: white; }
+    .answer.correct .answer-mark { background: #d3eddf; color: #126d50; }
+    .answer.incorrect { border-color: var(--orange); border-left-color: var(--orange); background: #fff1ec; box-shadow: 0 4px 12px rgba(220, 85, 63, .1); }
+    .answer.incorrect .answer-key { border-color: var(--orange); background: var(--orange); color: white; }
+    .answer.incorrect .answer-mark { background: #f9ddd5; color: #a63d2b; }
+    .feedback { min-height: 24px; margin-top: 15px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .feedback.good { color: #168b68; }
+    .feedback.bad { color: #a64c31; }
+    .panel-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 9px; }
+    .keyboard-hint { color: #77827c; font: 10px var(--mono); }
+    .primary-button { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 16px; border: 0; border-radius: 3px; background: var(--primary); color: white; font-size: 12px; font-weight: 800; cursor: pointer; transition: background .18s, transform .18s; }
+    .primary-button:hover { background: #006979; transform: translateY(-1px); }
+    .primary-button:disabled { background: #a6b1aa; cursor: not-allowed; transform: none; }
+    .primary-button svg { width: 15px; height: 15px; }
+    .side-panel { padding: 22px; border-top: 4px solid var(--primary); animation: enter .65s .16s both; }
+    .side-title { margin: 0 0 17px; font: 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    .stat { display: flex; justify-content: space-between; padding: 13px 0; border-top: 1px solid #e8eae2; font-size: 12px; }
+    .stat span:first-child { color: var(--muted); }
+    .stat strong { font: 12px var(--mono); }
+    .topic-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
+    .topic-chip { padding: 6px 8px; border: 1px solid var(--line); color: var(--muted); font: 9px var(--mono); }
+    .side-note { margin: 21px 0 0; padding: 13px; background: #f3f5fc; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .result-head { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .result-score { width: 70px; height: 70px; display: grid; place-items: center; flex: 0 0 70px; border-radius: 50%; background: var(--lime); color: var(--ink); font: 20px var(--mono); }
+    .result-head h2 { margin: 0 0 4px; font-size: 21px; }
+    .result-head p { margin: 0; color: var(--muted); font-size: 12px; }
+    .review-list { display: grid; gap: 9px; max-height: 440px; overflow: auto; padding-right: 5px; }
+    .review-item { padding: 12px 13px; border-left: 3px solid #51a17d; background: #f5f8f2; }
+    .review-item.wrong { border-color: #d57a60; background: #fff7f2; }
+    .review-question { margin: 0 0 7px; font-size: 12px; font-weight: 800; line-height: 1.45; }
+    .review-answer { margin: 3px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .review-answer strong { color: #168b68; }
+    .review-item.wrong .review-answer strong { color: #a64c31; }
+    .hidden { display: none !important; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 18px 0 28px; border-top: 1px solid var(--line); color: var(--muted); font: 10px var(--mono); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+    @keyframes enter { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes node-pulse { 50% { transform: scale(1.16); } }
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 32px, 600px); }
+      .topbar { height: 64px; }
+      main { padding: 34px 0 40px; }
+      .intro { grid-template-columns: 1fr; gap: 20px; }
+      .network-art { height: 105px; }
+      .workspace { grid-template-columns: 1fr; }
+      .quiz-panel { min-height: 0; padding: 23px 20px 20px; }
+      .side-panel { padding: 18px 20px; }
+      .question { min-height: 0; font-size: 20px; }
+      .side-note { margin-top: 14px; }
+    }
+    @media (max-width: 430px) {
+      .author { max-width: 125px; text-align: right; line-height: 1.5; }
+      h1 { font-size: 38px; }
+      .panel-bottom { align-items: flex-end; }
+      .keyboard-hint { max-width: 120px; line-height: 1.5; }
+      .primary-button { padding: 0 12px; }
+    }
+    @media (max-width: 560px) {
+      .answers { grid-template-columns: 1fr; }
+      .answer { min-height: 60px; }
+      .question-visual { grid-template-columns: 92px minmax(0, 1fr); gap: 12px; padding: 10px 12px; }
+      .visual-art { width: 92px; height: 70px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 12 5 5m7 7 7-7m-7 7v7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="5" cy="5" r="2.3" fill="currentColor"/><circle cx="19" cy="5" r="2.3" fill="currentColor"/><circle cx="12" cy="12" r="2.8" fill="currentColor"/><circle cx="12" cy="19" r="2.3" fill="currentColor"/></svg>
+        </span>
+        <span>IMR <span style="color:var(--muted);font-weight:500">/ LABORATORIO DE REDES</span></span>
+      </div>
+      <div class="author">AUTOR: EQUIPO CUESTIONARIO IMR</div>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Evaluación interactiva · 10 preguntas</p>
+          <h1 id="page-title">Pon a prueba tu<br><span>instinto de red.</span></h1>
+          <p class="intro-copy">Un recorrido rápido por protocolos, cableado estructurado y fibra óptica. Cada intento elige diez preguntas al azar.</p>
+        </div>
+        <div class="network-art" aria-hidden="true">
+          <svg viewBox="0 0 250 132" fill="none">
+            <path d="M29 91 81 40l55 50 55-62m-55 62 76 18M81 40l-9-24m64 74 9 28" stroke="#9db5a8" stroke-width="1.4" stroke-dasharray="3 4"/>
+            <path d="M29 91h52m55-1h55" stroke="#007f95" stroke-width="1.4"/>
+            <circle cx="29" cy="91" r="7" fill="#f2d34f" stroke="#007f95" stroke-width="2"/><circle cx="81" cy="40" r="6" fill="#fffefd" stroke="#007f95" stroke-width="2"/><circle cx="136" cy="90" r="9" fill="#007f95"/><circle cx="191" cy="28" r="6" fill="#fffefd" stroke="#dc553f" stroke-width="2"/><circle cx="212" cy="108" r="6" fill="#fffefd" stroke="#007f95" stroke-width="2"/><circle cx="72" cy="16" r="4" fill="#dc553f"/><circle cx="145" cy="118" r="4" fill="#f2d34f" stroke="#007f95" stroke-width="1.5"/>
+            <path d="M22 104h14m-7-7v14m105-31v20m-7-10h14" stroke="#fffefa" stroke-width="1.4"/>
+          </svg>
+          <span class="art-label">NODO 04 / TOPOLOGÍA ACTIVA</span>
+        </div>
+      </section>
+
+      <div class="workspace">
+        <section class="quiz-panel" aria-live="polite">
+          <div id="quiz-view">
+            <div class="panel-top">
+              <span class="question-count" id="question-count">PREGUNTA 01 / 10</span>
+              <span class="topic-tag" id="topic-tag">REDES</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-label="Progreso del cuestionario" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><div class="progress-fill" id="progress-fill"></div></div>
+            <h2 class="question" id="question-text"></h2>
+            <figure class="question-visual">
+              <div class="visual-art" id="question-image" aria-hidden="true"></div>
+              <figcaption><span class="visual-kicker">PISTA VISUAL</span><strong class="visual-title" id="visual-title"></strong></figcaption>
+            </figure>
+            <div class="answers" id="answers"></div>
+            <div class="feedback" id="feedback" aria-live="polite"></div>
+            <div class="panel-bottom">
+              <span class="keyboard-hint">Selecciona una respuesta para corregir</span>
+              <button class="primary-button" id="next-button" type="button" disabled>
+                Siguiente
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.5 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="result-view" class="hidden"></div>
+        </section>
+
+        <aside class="side-panel" aria-label="Información del cuestionario">
+          <h2 class="side-title">En esta sesión</h2>
+          <div class="stat"><span>Preguntas elegidas</span><strong>10 / 30</strong></div>
+          <div class="stat"><span>Respuestas por pregunta</span><strong>04</strong></div>
+          <div class="stat"><span>Corrección</span><strong>INMEDIATA</strong></div>
+          <div class="topic-list" aria-label="Temas">
+            <span class="topic-chip">OSI / TCP-IP</span><span class="topic-chip">UTP</span><span class="topic-chip">RJ45</span><span class="topic-chip">T568A/B</span><span class="topic-chip">FIBRA</span><span class="topic-chip">HERRAMIENTAS</span>
+          </div>
+          <p class="side-note">Las preguntas se barajan en cada partida. Al terminar podrás revisar cada respuesta y conocer tu puntuación.</p>
+        </aside>
+      </div>
+    </main>
+
+    <footer><span>IMR · CUESTIONARIO DE REDES</span><span>APRENDE · CONECTA · VERIFICA</span></footer>
+  </div>
+
+  <script>
+    "use strict";
+    const questionBank = [
+      { topic: "Redes", question: "¿Qué dispositivo conecta redes diferentes y determina la mejor ruta para los paquetes?", options: ["Un switch", "Un router", "Un repetidor", "Un punto de acceso"], answer: 1 },
+      { topic: "Acrónimos", question: "¿Qué significan las siglas LAN?", options: ["Local Area Network", "Linked Access Node", "Long Analog Network", "Local Assigned Number"], answer: 0 },
+      { topic: "Acrónimos", question: "¿Qué protocolo asigna automáticamente direcciones IP a los dispositivos?", options: ["DNS", "DHCP", "FTP", "ARP"], answer: 1 },
+      { topic: "Redes", question: "¿En qué capa del modelo OSI opera principalmente un switch Ethernet tradicional?", options: ["Capa física", "Capa de enlace de datos", "Capa de red", "Capa de aplicación"], answer: 1 },
+      { topic: "Acrónimos", question: "¿Qué servicio traduce nombres de dominio, como ejemplo.com, a direcciones IP?", options: ["DNS", "NAT", "SSH", "SMTP"], answer: 0 },
+      { topic: "UTP", question: "¿Qué característica ayuda a reducir las interferencias en un cable UTP?", options: ["Los pares de hilos trenzados", "Una cubierta metálica", "Un núcleo de vidrio", "Un único conductor central"], answer: 0 },
+      { topic: "RJ45", question: "¿Cuántos contactos tiene un conector modular 8P8C usado habitualmente en Ethernet y conocido como RJ45?", options: ["4", "6", "8", "12"], answer: 2 },
+      { topic: "T568A/B", question: "En el esquema T568B, ¿qué color ocupa el pin 1?", options: ["Blanco/verde", "Verde", "Blanco/naranja", "Naranja"], answer: 2 },
+      { topic: "T568A/B", question: "¿Qué pares intercambian su posición entre los esquemas T568A y T568B?", options: ["Azul y marrón", "Verde y naranja", "Azul y verde", "Naranja y marrón"], answer: 1 },
+      { topic: "Herramientas", question: "¿Qué herramienta se utiliza para insertar los hilos en un panel de parcheo tipo 110?", options: ["Crimpadora", "Herramienta de impacto", "Pelacables coaxial", "Medidor óptico"], answer: 1 },
+      { topic: "Herramientas", question: "¿Para qué sirve principalmente un comprobador de cables de red?", options: ["Medir la velocidad de internet", "Verificar continuidad y orden de los conductores", "Amplificar la señal Wi-Fi", "Asignar direcciones IP"], answer: 1 },
+      { topic: "Fibra óptica", question: "¿Cómo transmite información una fibra óptica?", options: ["Mediante impulsos de luz", "Mediante corriente continua", "Mediante ondas de sonido", "Mediante campos magnéticos"], answer: 0 },
+      { topic: "Fibra óptica", question: "¿Qué tipo de fibra se suele usar para enlaces de larga distancia y un alto ancho de banda?", options: ["Multimodo de índice escalonado", "Monomodo", "UTP categoría 5", "Coaxial de banda base"], answer: 1 },
+      { topic: "Conectores", question: "¿Qué tipo de acoplamiento utiliza normalmente un conector de fibra SC?", options: ["Push-pull cuadrado", "Bayoneta BNC", "Rosca metálica", "Cierre tipo RJ11"], answer: 0 },
+      { topic: "Conectores", question: "¿Qué ventaja física suele ofrecer el conector LC frente al SC?", options: ["Tiene un formato más compacto", "No necesita fibra óptica", "Permite usar cable UTP", "No requiere pulido"], answer: 0 },
+      { topic: "Redes", question: "¿Qué identifica de forma única a una interfaz de red en la capa de enlace?", options: ["La máscara de subred", "La dirección MAC", "El nombre DNS", "El número de puerto TCP"], answer: 1 },
+      { topic: "Acrónimos", question: "¿Qué significan las siglas WAN?", options: ["Wireless Access Name", "Wide Area Network", "Wired Assigned Network", "Web Address Node"], answer: 1 },
+      { topic: "Redes", question: "¿Qué protocolo de transporte ofrece entrega fiable y ordenada de datos?", options: ["UDP", "ICMP", "TCP", "ARP"], answer: 2 },
+      { topic: "Redes", question: "¿Qué equipo permite que varios dispositivos se conecten a una LAN y reenvía tramas según direcciones MAC?", options: ["Switch", "Módem", "Firewall de aplicación", "Transceptor óptico"], answer: 0 },
+      { topic: "UTP", question: "¿Qué categoría de cable UTP está especificada para canales de hasta 10 Gb/s a 100 m?", options: ["Categoría 5", "Categoría 5e", "Categoría 6", "Categoría 6A"], answer: 3 },
+      { topic: "UTP", question: "En una instalación Ethernet, ¿qué longitud máxima se recomienda para un canal de cableado estructurado de cobre?", options: ["50 m", "90 m", "100 m", "150 m"], answer: 2 },
+      { topic: "T568A/B", question: "Si ambos extremos de un cable directo se terminan con el mismo esquema, ¿qué ocurre con el orden de los pares?", options: ["Se cruzan los pares verde y naranja", "Se conserva el mismo orden en ambos extremos", "Se invierten los pares azul y marrón", "Se transmite únicamente por dos hilos"], answer: 1 },
+      { topic: "T568A/B", question: "¿Qué esquema coloca el par verde en los pines 1 y 2?", options: ["T568A", "T568B", "Ambos siempre", "Ninguno"], answer: 0 },
+      { topic: "RJ45", question: "¿Qué herramienta termina un conector modular 8P8C en el extremo de un latiguillo de cobre?", options: ["Crimpadora modular", "Empalmadora de fusión", "Herramienta de impacto", "Microscopio de inspección"], answer: 0 },
+      { topic: "Herramientas", question: "¿Qué herramienta mide la pérdida de potencia en un enlace de fibra óptica junto con una fuente de luz?", options: ["Certificador de cobre", "Medidor de potencia óptica", "Comprobador de pares", "Analizador de espectro Wi-Fi"], answer: 1 },
+      { topic: "Fibra óptica", question: "¿Qué elemento guía la luz en una fibra óptica?", options: ["El revestimiento exterior de PVC", "El núcleo rodeado por un revestimiento óptico", "Un conductor de cobre trenzado", "La cubierta de blindaje"], answer: 1 },
+      { topic: "Fibra óptica", question: "¿Cuál es una ventaja habitual de la fibra óptica frente al cobre?", options: ["Es inmune a las interferencias electromagnéticas", "No necesita equipos de transmisión", "Siempre es más fácil de reparar", "Transporta corriente para alimentar el equipo"], answer: 0 },
+      { topic: "Conectores", question: "¿Qué tipo de pulido de conector reduce la reflexión de retorno con una cara inclinada?", options: ["UPC", "APC", "PC", "ST"], answer: 1 },
+      { topic: "Conectores", question: "¿Qué conector de fibra suele incluir un mecanismo de acoplamiento push-pull y un casquillo de 2,5 mm?", options: ["LC", "SC", "MPO", "RJ45"], answer: 1 },
+      { topic: "Acrónimos", question: "¿Qué significan las siglas PoE en redes Ethernet?", options: ["Protocol over Ethernet", "Power over Ethernet", "Port on Extension", "Packet of Equipment"], answer: 1 }
+    ];
+
+    const quizView = document.getElementById("quiz-view");
+    const resultView = document.getElementById("result-view");
+    const questionCount = document.getElementById("question-count");
+    const questionText = document.getElementById("question-text");
+    const topicTag = document.getElementById("topic-tag");
+    const answersElement = document.getElementById("answers");
+    const feedback = document.getElementById("feedback");
+    const nextButton = document.getElementById("next-button");
+    const progressFill = document.getElementById("progress-fill");
+    const progressBar = document.querySelector('[role="progressbar"]');
+    const answerLetters = ["A", "B", "C", "D"];
+    const questionImage = document.getElementById("question-image");
+    const visualTitle = document.getElementById("visual-title");
+    const visualScenes = {
+      "Redes": { title: "NODOS Y RUTAS", svg: '<svg viewBox="0 0 140 86" fill="none"><path d="M22 43 57 19l30 25 31-23M57 19l4 49 26-24 31 22" stroke="#8ab9b8" stroke-width="2" stroke-dasharray="4 4"/><rect x="12" y="34" width="20" height="18" rx="4" fill="#d9f0ef" stroke="#007f95" stroke-width="2"/><rect x="50" y="10" width="18" height="18" rx="4" fill="#fffefd" stroke="#007f95" stroke-width="2"/><rect x="78" y="34" width="19" height="19" rx="5" fill="#007f95"/><rect x="111" y="10" width="18" height="18" rx="4" fill="#fffefd" stroke="#dc553f" stroke-width="2"/><circle cx="61" cy="68" r="7" fill="#f2d34f" stroke="#007f95" stroke-width="2"/></svg>' },
+      "Acrónimos": { title: "SERVICIOS DE RED", svg: '<svg viewBox="0 0 140 86" fill="none"><rect x="16" y="10" width="48" height="66" rx="5" fill="#e6f4f3" stroke="#007f95" stroke-width="2"/><rect x="24" y="19" width="32" height="12" rx="2" fill="#fffefd" stroke="#9bc9c8"/><rect x="24" y="38" width="32" height="12" rx="2" fill="#fffefd" stroke="#9bc9c8"/><rect x="24" y="57" width="32" height="12" rx="2" fill="#fffefd" stroke="#9bc9c8"/><path d="M65 43h26m-13-13v26m13-26 20-16m-20 42 20 16" stroke="#007f95" stroke-width="2"/><circle cx="117" cy="14" r="8" fill="#fffefd" stroke="#dc553f" stroke-width="2"/><circle cx="117" cy="72" r="8" fill="#f2d34f" stroke="#007f95" stroke-width="2"/></svg>' },
+      "UTP": { title: "PARES TRENZADOS", svg: '<svg viewBox="0 0 140 86" fill="none"><path d="M8 27c14-20 24 20 38 0s24 20 38 0 24 20 48 0M8 35c14 20 24-20 38 0s24-20 38 0 24-20 48 0" stroke="#dc553f" stroke-width="3"/><path d="M8 53c14-20 24 20 38 0s24 20 38 0 24 20 48 0M8 61c14 20 24-20 38 0s24-20 38 0 24-20 48 0" stroke="#007f95" stroke-width="3"/><path d="M6 20v48m128-48v48" stroke="#1b3239" stroke-width="2"/></svg>' },
+      "RJ45": { title: "CONECTOR 8P8C", svg: '<svg viewBox="0 0 140 86" fill="none"><path d="M23 27h94v40H23z" fill="#d9f0ef" stroke="#007f95" stroke-width="2.5"/><path d="M35 17h70v10H35z" fill="#f2d34f" stroke="#007f95" stroke-width="2"/><path d="M39 28v18m9-18v18m9-18v18m9-18v18m9-18v18m9-18v18m9-18v18m9-18v18" stroke="#dc553f" stroke-width="2.5"/><path d="M35 57h70M43 67v8m12-8v8m12-8v8m12-8v8m12-8v8" stroke="#007f95" stroke-width="2"/></svg>' },
+      "T568A/B": { title: "ORDEN DE PINES", svg: '<svg viewBox="0 0 140 86" fill="none"><rect x="12" y="20" width="13" height="48" rx="2" fill="#fffefd" stroke="#cfe0e0"/><rect x="28" y="20" width="13" height="48" rx="2" fill="#dc553f"/><rect x="44" y="20" width="13" height="48" rx="2" fill="#fffefd" stroke="#cfe0e0"/><rect x="60" y="20" width="13" height="48" rx="2" fill="#007f95"/><rect x="76" y="20" width="13" height="48" rx="2" fill="#fffefd" stroke="#cfe0e0"/><rect x="92" y="20" width="13" height="48" rx="2" fill="#168b68"/><rect x="108" y="20" width="13" height="48" rx="2" fill="#fffefd" stroke="#cfe0e0"/><rect x="124" y="20" width="8" height="48" rx="2" fill="#8c6239"/><path d="M12 75h120" stroke="#1b3239" stroke-width="2"/></svg>' },
+      "Herramientas": { title: "INSTALACIÓN Y TEST", svg: '<svg viewBox="0 0 140 86" fill="none"><path d="m22 13 20 21-12 12L12 28a15 15 0 0 0 20 20l30 30 10-10-30-30a15 15 0 0 0-20-25Z" fill="#d9f0ef" stroke="#007f95" stroke-width="2.5"/><rect x="77" y="13" width="46" height="60" rx="7" fill="#fffefd" stroke="#007f95" stroke-width="2.5"/><rect x="86" y="22" width="28" height="17" rx="3" fill="#e6f4f3" stroke="#8ab9b8"/><path d="M89 51h22m-18 9h14" stroke="#007f95" stroke-width="2"/><circle cx="101" cy="33" r="3" fill="#f2d34f"/></svg>' },
+      "Fibra óptica": { title: "SEÑAL DE LUZ", svg: '<svg viewBox="0 0 140 86" fill="none"><path d="M9 43h122" stroke="#b6dcdc" stroke-width="22" stroke-linecap="round"/><path d="M9 43h122" stroke="#fffefd" stroke-width="12" stroke-linecap="round"/><path d="M9 43h122" stroke="#00aebe" stroke-width="3" stroke-linecap="round"/><path d="m70 35 9 8-9 8" stroke="#f2d34f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="43" r="5" fill="#f2d34f"/><circle cx="120" cy="43" r="5" fill="#f2d34f"/></svg>' },
+      "Conectores": { title: "TERMINALES SC / LC", svg: '<svg viewBox="0 0 140 86" fill="none"><path d="M8 28h25l10 9v20l-10 9H8z" fill="#d9f0ef" stroke="#007f95" stroke-width="2.5"/><path d="M33 34h17v26H33m-16-18v16" stroke="#007f95" stroke-width="2"/><path d="M75 33h18l8 6v16l-8 6H75z" fill="#fffefd" stroke="#dc553f" stroke-width="2.5"/><path d="M93 38h13v18H93m-12-13v8" stroke="#dc553f" stroke-width="2"/><path d="M51 47h23m34 0h19" stroke="#8ab9b8" stroke-width="2" stroke-dasharray="3 3"/><text x="15" y="77" fill="#007f95" font-size="9" font-family="monospace">SC</text><text x="81" y="77" fill="#dc553f" font-size="9" font-family="monospace">LC</text></svg>' }
+    };
+    let selectedQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let selectedAnswer = null;
+
+    function shuffle(items) {
+      const shuffled = [...items];
+      for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+      }
+      return shuffled;
+    }
+
+    function startGame() {
+      selectedQuestions = shuffle(questionBank).slice(0, 10);
+      currentIndex = 0;
+      score = 0;
+      quizView.classList.remove("hidden");
+      resultView.classList.add("hidden");
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const item = selectedQuestions[currentIndex];
+      selectedAnswer = null;
+      questionCount.textContent = `PREGUNTA ${String(currentIndex + 1).padStart(2, "0")} / 10`;
+      topicTag.textContent = item.topic.toUpperCase();
+      questionText.textContent = item.question;
+      const visual = visualScenes[item.topic];
+      questionImage.innerHTML = visual.svg;
+      visualTitle.textContent = visual.title;
+      feedback.textContent = "";
+      feedback.className = "feedback";
+      nextButton.disabled = true;
+      nextButton.innerHTML = currentIndex === 9
+        ? 'Ver resultado <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.5 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : 'Siguiente <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.5 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      progressFill.style.width = `${(currentIndex / 10) * 100}%`;
+      progressBar.setAttribute("aria-valuenow", String(currentIndex));
+      answersElement.replaceChildren();
+
+      item.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer";
+        button.innerHTML = `<span class="answer-key">${answerLetters[index]}</span><span class="answer-text"></span><span class="answer-mark" aria-hidden="true"></span>`;
+        button.querySelector(".answer-text").textContent = option;
+        button.addEventListener("click", () => checkAnswer(index));
+        answersElement.append(button);
+      });
+    }
+
+    function checkAnswer(choice) {
+      if (selectedAnswer !== null) return;
+      selectedAnswer = choice;
+      const item = selectedQuestions[currentIndex];
+      const completedCount = currentIndex + 1;
+      progressFill.style.width = `${(completedCount / 10) * 100}%`;
+      progressBar.setAttribute("aria-valuenow", String(completedCount));
+      const answerButtons = [...answersElement.children];
+      answerButtons.forEach((button, index) => {
+        button.disabled = true;
+        if (index === item.answer) {
+          button.classList.add("correct");
+          button.querySelector(".answer-mark").textContent = "✓";
+        } else if (index === choice) {
+          button.classList.add("incorrect");
+          button.querySelector(".answer-mark").textContent = "×";
+        }
+      });
+      if (choice === item.answer) {
+        score += 1;
+        feedback.textContent = "Correcto. ¡Buen trabajo!";
+        feedback.classList.add("good");
+      } else {
+        feedback.textContent = `No es esa. La respuesta correcta es: ${item.options[item.answer]}.`;
+        feedback.classList.add("bad");
+      }
+      nextButton.disabled = false;
+      nextButton.focus();
+    }
+
+    function showResults() {
+      quizView.classList.add("hidden");
+      resultView.classList.remove("hidden");
+      const percentage = score * 10;
+      const message = score >= 8 ? "¡Excelente dominio!" : score >= 5 ? "Buen trabajo, sigue practicando." : "Un buen punto de partida para repasar.";
+      resultView.innerHTML = `
+        <div class="result-head">
+          <div class="result-score" aria-label="${score} de 10">${score}<span style="font-size:12px">/10</span></div>
+          <div><h2>Cuestionario completado</h2><p>${message} ${percentage}% de aciertos.</p></div>
+        </div>
+        <h3 class="side-title">Revisión de respuestas</h3>
+        <div class="review-list" id="review-list"></div>
+        <div class="panel-bottom" style="margin-top:20px">
+          <span class="keyboard-hint">Se han usado 10 preguntas aleatorias</span>
+          <button class="primary-button" id="restart-button" type="button">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16 8a6 6 0 1 0 1 4M16 4v4h-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Volver a jugar
+          </button>
+        </div>`;
+      const reviewList = document.getElementById("review-list");
+      selectedQuestions.forEach((item, index) => {
+        const wasCorrect = item.userAnswer === item.answer;
+        const selectedText = item.options[item.userAnswer];
+        const article = document.createElement("article");
+        article.className = `review-item${wasCorrect ? "" : " wrong"}`;
+        article.innerHTML = `<p class="review-question">${String(index + 1).padStart(2, "0")}. ${item.question}</p><p class="review-answer">Tu respuesta: <span class="user-answer"></span></p><p class="review-answer">Correcta: <strong class="correct-answer"></strong></p>`;
+        article.querySelector(".user-answer").textContent = selectedText;
+        article.querySelector(".correct-answer").textContent = item.options[item.answer];
+        reviewList.append(article);
+      });
+      document.getElementById("restart-button").addEventListener("click", startGame);
+      document.getElementById("restart-button").focus();
+    }
+
+    nextButton.addEventListener("click", () => {
+      if (selectedAnswer === null) return;
+      selectedQuestions[currentIndex].userAnswer = selectedAnswer;
+      currentIndex += 1;
+      if (currentIndex === selectedQuestions.length) showResults();
+      else renderQuestion();
+    });
+
+    startGame();
+  </script>
+</body>
+</html>
